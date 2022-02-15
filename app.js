@@ -129,7 +129,7 @@
             nextNavContainer.closest("div.accordion-collapse").classList.add("show")
         }
 
-        moveChapters(bookContent,currentChapter,nextChapter);
+        moveChapters(bookContent,currentChapter,nextChapter,1);
         updateDots(currentNav,nextNav);
 
         nextNav.scrollIntoView(false);
@@ -158,7 +158,7 @@
             nextNavContainer.closest("div.accordion-collapse").classList.add("show")
         }
 
-        moveChapters(bookContent,currentChapter,prevChapter);
+        moveChapters(bookContent,currentChapter,prevChapter,-1);
         updateDots(currentNav,nextNav);
 
         nextNav.scrollIntoView(false);
@@ -340,13 +340,13 @@
     //   };
 
 
-    const moveChapters=(bookContent,currentChapter,targetChapter)=>{
+    const moveChapters=(bookContent,currentChapter,targetChapter,direction)=>{
         targetChapter.scrollTo(0,0);
 
         if(mainBook.classList.contains("reading"))
             mainBook.classList.remove("reading");
 
-        bookContent.style.transform="translateY(-"+targetChapter.style.top+")";
+        bookContent.style.transform="translateY(-"+(targetChapter.offsetHeight*direction)+"px)";
         currentChapter.classList.remove("current-chapter");
         targetChapter.classList.add("current-chapter");
 
@@ -362,11 +362,11 @@
         }
     }
 
-    const setBookPosition=(bookChapters,index)=>{
-        bookChapters.style.top=100*index+"%"; 
-    };
+    // const setBookPosition=(bookChapters,index)=>{
+    //     bookChapters.style.top=100*index+"%"; 
+    // };
 
-    bookChapters.forEach(setBookPosition);
+    // bookChapters.forEach(setBookPosition);
 
     
     const updateDots=(currentNav,targetNav)=>{
@@ -380,7 +380,6 @@
     }
 
     const updateHeaderTitle=(targetTitle)=>{
-        console.log(targetTitle,headerTitle);
         headerTitle.innerHTML=targetTitle.innerHTML;
     }
     

@@ -272,24 +272,20 @@ img {
   border-radius: var(--container-border-radius);
 }
 .book-content {
-  height: 100%;
+  min-height: fit-content;
   position: relative;
 
   transition: transform var(--anim-slow) ease-in;
+
+  overflow: scroll;
 }
 .chapters {
   width: 100%;
-  min-height: 100%;
-
+  height: fit-content;
   padding: 1em;
   padding-bottom: var(--header-heights);
 
-  position: absolute;
-  top: 0;
-  bottom: 0;
-
   background-color: var(--white);
-  overflow: scroll;
 }
 .footer {
   width: 100%;
