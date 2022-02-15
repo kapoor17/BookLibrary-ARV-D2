@@ -6,8 +6,10 @@
     //const previewButton=accordionCover.querySelector(".preview-button");
 
     //const goToTop=accordionCover.querySelector(".go-back");
+    const wrapper=document.querySelector(".wrapper")
     const contentlibrary=document.querySelector(".content-library");
     const chapterNav = document.querySelectorAll(".chapter-nav");
+    const menuBtn=document.querySelector(".menu-btn");
     
     //main-book objects
 
@@ -15,7 +17,7 @@
 
     //const bookCover = accordionCover.querySelector(".book-cover");
     //const returnButton=mainBook.querySelector(".return");
-    const headerTitle=document.querySelector(".chapter-title");
+    const headerTitle=document.querySelectorAll(".chapter-title");
     
     const bookContent=mainBook.querySelector(".book-content");
     const bookChapters = Array.from(bookContent.children);
@@ -176,12 +178,12 @@
             if(delta>0){
                 //scrolling down        
                 topCounter=0;
-                if(!mainBook.classList.contains("reading")&&bottomCounter==0)
-                    mainBook.classList.add("reading");         
+                if(!wrapper.classList.contains("reading")&&bottomCounter==0)
+                    wrapper.classList.add("reading");         
                 if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
                     if(bottomCounter==0){
-                        if(mainBook.classList.contains("reading"))
-                            mainBook.classList.remove("reading");
+                        if(wrapper.classList.contains("reading"))
+                            wrapper.classList.remove("reading");
                         bottomCounter++;
                     }
                 }
@@ -191,11 +193,11 @@
                 //scrolling up 
 
                 bottomCounter=0;
-                if(mainBook.classList.contains)
-                    mainBook.classList.remove("reading");
+                if(wrapper.classList.contains)
+                    wrapper.classList.remove("reading");
 
             }
-            if(mainBook.classList.contains("footnote-open"))
+            if(wrapper.classList.contains("footnote-open"))
                     closeFootnote.click();
         });
     });
@@ -211,14 +213,14 @@
     //             //scrolling down 
                 
     //             topCounter=0;
-    //             if(!mainBook.classList.contains("reading")&&bottomCounter==0)
-    //                 mainBook.classList.add("reading");
+    //             if(!wrapper.classList.contains("reading")&&bottomCounter==0)
+    //                 wrapper.classList.add("reading");
                 
     //             if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
     //                 if(bottomCounter==0){
     //                     chapterDown.click();
-    //                     if(mainBook.classList.contains("reading"))
-    //                         mainBook.classList.remove("reading");
+    //                     if(wrapper.classList.contains("reading"))
+    //                         wrapper.classList.remove("reading");
     //                     bottomCounter++;
     //                 }
     //             }
@@ -227,20 +229,20 @@
     //         if(delta<0){
     //             //scrolling up 
     //             bottomCounter=0;
-    //             if(mainBook.classList.contains)
-    //                 mainBook.classList.remove("reading");
+    //             if(wrapper.classList.contains)
+    //                 wrapper.classList.remove("reading");
                 
     //             if($(this).scrollTop()==0){
     //                 if(topCounter==0){
     //                     chapterUp.click();
-    //                     if(!mainBook.classList.contains("reading"))
-    //                     mainBook.classList.add("reading");
+    //                     if(!wrapper.classList.contains("reading"))
+    //                     wrapper.classList.add("reading");
     //                     topCounter++;
     //                  }
     //             }
 
     //         }
-    //         if(mainBook.classList.contains("footnote-open"))
+    //         if(wrapper.classList.contains("footnote-open"))
     //                 closeFootnote.click();
     //     });
     // });
@@ -248,8 +250,8 @@
 
     bookChapters.forEach(chapter=>{
         chapter.addEventListener("click",function(){
-                mainBook.classList.toggle("reading");
-                if(mainBook.classList.contains("footnote-open"))
+                wrapper.classList.toggle("reading");
+                if(wrapper.classList.contains("footnote-open"))
                     closeFootnote.click();
         });
         //chapter.addEventListener('touchstart', handleTouchStart, false);        
@@ -310,10 +312,10 @@
 
     //             ///*chapters
     //             if(this.classList.contains("chapters")){
-    //                 mainBook.classList.add("reading");
+    //                 wrapper.classList.add("reading");
     //                 if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight)
     //                     chapterDown.click();
-    //                 if(mainBook.classList.contains("footnote-open"))
+    //                 if(wrapper.classList.contains("footnote-open"))
     //                     closeFootnote.click();
     //             }
     //         } else { 
@@ -321,11 +323,11 @@
 
     //            // /*chapters*
     //             if(this.classList.contains("chapters")){
-    //                 if(mainBook.classList.contains("reading"))
-    //                     mainBook.classList.remove("reading");
+    //                 if(wrapper.classList.contains("reading"))
+    //                     wrapper.classList.remove("reading");
     //                 if($(this).scrollTop()==0)
     //                     chapterUp.click();
-    //                 if(mainBook.classList.contains("footnote-open"))
+    //                 if(wrapper.classList.contains("footnote-open"))
     //                     closeFootnote.click();
     //             }                  
     //             if(this.classList.contains("content-library")){
@@ -343,8 +345,8 @@
     const moveChapters=(bookContent,currentChapter,targetChapter)=>{
         targetChapter.scrollTo(0,0);
 
-        if(mainBook.classList.contains("reading"))
-            mainBook.classList.remove("reading");
+        if(wrapper.classList.contains("reading"))
+            wrapper.classList.remove("reading");
 
         bookContent.style.transform="translateY(-"+targetChapter.style.top+")";
         currentChapter.classList.remove("current-chapter");
@@ -381,7 +383,10 @@
 
     const updateHeaderTitle=(targetTitle)=>{
         console.log(targetTitle,headerTitle);
-        headerTitle.innerHTML=targetTitle.innerHTML;
+        headerTitle.forEach(title=>{
+
+            title.innerHTML=targetTitle.innerHTML;
+        })
     }
     
     function detectHistory(){
@@ -389,3 +394,22 @@
     }
     
     window.addEventListener("popstate",detectHistory);
+
+    let menuOpen=false;
+
+    const burgerMenu=()=>{
+        menuBtn.addEventListener("click",()=>{
+            if(!menuOpen){
+                menuBtn.classList.remove("open");
+                menuOpen=true;
+                wrapper.querySelector(".content-library-container").classList.add("closed")
+            }
+            else{
+                menuBtn.classList.add("open");
+                menuOpen=false;
+                wrapper.querySelector(".content-library-container").classList.remove("closed"); 
+            }
+        })
+    }
+
+    burgerMenu();
