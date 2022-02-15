@@ -19,16 +19,16 @@
     //const returnButton=mainBook.querySelector(".return");
     const headerTitle=document.querySelectorAll(".chapter-title");
     
-    const bookContent=mainBook.querySelector(".book-content");
-    const bookChapters = Array.from(bookContent.children);
+    const bookContent=mainBook.querySelectorAll(".book-content");
+    // const bookChapters = Array.from(content.children);
 
     const footnotes = mainBook.querySelectorAll(".footnote")
     
-    const footer = mainBook.querySelector(".footer");
+    //const footer = mainBook.querySelector(".footer");
     // const controls = footer.querySelector(".controls");
-     const arrows = mainBook.querySelector(".arrows");
-     const chapterUp=footer.querySelector(".chapter-up");
-     const chapterDown=footer.querySelector(".chapter-down");
+     //const arrows = mainBook.querySelector(".arrows");
+     //const chapterUp=footer.querySelector(".chapter-up");
+     //const chapterDown=footer.querySelector(".chapter-down");
      const closeFootnote = document.querySelector(".close-footnote");
     // const footnoteContainer = footer.querySelector(".foot-notes")
 
@@ -110,7 +110,7 @@
         if(mainBook.classList.contains("footnote-open"))
             closeFootnote.click();
     })*/
-
+/*
     chapterDown.addEventListener("click",()=>{
         const currentChapter=bookContent.querySelector(".current-chapter");
         const nextChapter=currentChapter.nextElementSibling;
@@ -166,41 +166,41 @@
         nextNav.scrollIntoView(false);
 
         
-    })
+    }) */
 
 
-    bookChapters.forEach(chapter=>{
-        var bottomCounter=0
+    // bookChapters.forEach(chapter=>{
+    //     var bottomCounter=0
 
-        $(chapter).on("wheel",function(e){
-            var delta = e.originalEvent.deltaY;
+    //     $(chapter).on("wheel",function(e){
+    //         var delta = e.originalEvent.deltaY;
 
-            if(delta>0){
-                //scrolling down        
-                topCounter=0;
-                if(!wrapper.classList.contains("reading")&&bottomCounter==0)
-                    wrapper.classList.add("reading");         
-                if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
-                    if(bottomCounter==0){
-                        if(wrapper.classList.contains("reading"))
-                            wrapper.classList.remove("reading");
-                        bottomCounter++;
-                    }
-                }
-            }
+    //         if(delta>0){
+    //             //scrolling down        
+    //             topCounter=0;
+    //             if(!wrapper.classList.contains("reading")&&bottomCounter==0)
+    //                 wrapper.classList.add("reading");         
+    //             if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+    //                 if(bottomCounter==0){
+    //                     if(wrapper.classList.contains("reading"))
+    //                         wrapper.classList.remove("reading");
+    //                     bottomCounter++;
+    //                 }
+    //             }
+    //         }
 
-            if(delta<0){
-                //scrolling up 
+    //         if(delta<0){
+    //             //scrolling up 
 
-                bottomCounter=0;
-                if(wrapper.classList.contains)
-                    wrapper.classList.remove("reading");
+    //             bottomCounter=0;
+    //             if(wrapper.classList.contains)
+    //                 wrapper.classList.remove("reading");
 
-            }
-            if(wrapper.classList.contains("footnote-open"))
-                    closeFootnote.click();
-        });
-    });
+    //         }
+    //         if(wrapper.classList.contains("footnote-open"))
+    //                 closeFootnote.click();
+    //     });
+    // });
 
     // bookChapters.forEach(chapter=>{
     //     var bottomCounter=0;
@@ -248,15 +248,15 @@
     // });
 
 
-    bookChapters.forEach(chapter=>{
-        chapter.addEventListener("click",function(){
-                wrapper.classList.toggle("reading");
-                if(wrapper.classList.contains("footnote-open"))
-                    closeFootnote.click();
-        });
-        //chapter.addEventListener('touchstart', handleTouchStart, false);        
-        //chapter.addEventListener('touchmove', handleTouchMove, false);
-    })
+    // bookChapters.forEach(chapter=>{
+    //     chapter.addEventListener("click",function(){
+    //             wrapper.classList.toggle("reading");
+    //             if(wrapper.classList.contains("footnote-open"))
+    //                 closeFootnote.click();
+    //     });
+    //     //chapter.addEventListener('touchstart', handleTouchStart, false);        
+    //     //chapter.addEventListener('touchmove', handleTouchMove, false);
+    // })
 
     footnotes.forEach((footnote)=>{
         footnote.addEventListener("click",(e)=>{
@@ -364,11 +364,11 @@
         }
     }
 
-    const setBookPosition=(bookChapters,index)=>{
-        bookChapters.style.top=100*index+"%"; 
-    };
+    // const setBookPosition=(bookChapters,index)=>{
+    //     bookChapters.style.top=100*index+"%"; 
+    // };
 
-    bookChapters.forEach(setBookPosition);
+    // bookChapters.forEach(setBookPosition);
 
     
     const updateDots=(currentNav,targetNav)=>{
@@ -413,3 +413,64 @@
     }
 
     burgerMenu();
+
+    bookContent.forEach(content=>{
+        var bottomCounter=0;      
+        var topCounter=0;      
+        const tl=gsap.timeline({
+            defaults:{duration:0.5,ease:"Power2.in"},
+        });
+    
+         $(content).on("wheel",function(e){
+             var delta = e.originalEvent.deltaY;
+    
+             if(delta>0){
+                //scrolling down 
+                topCounter=0;
+                let titleHeigth="10vh";
+          
+                if(bottomCounter==0){
+                    tl.to(".header",{opacity:0});
+                    tl.to(".chapter-cover",{opacity:0},"<");
+                    tl.to(".title-container",{height:titleHeigth},"<");
+                    
+                    tl.to(".content-container",{y:"-17.5%"});
+                    tl.to(".sub-container-cb",{paddingTop:"0px"},"<");
+
+                    tl.to(".title-container .book-name",{y:-15},);
+                    tl.to(".chapter-cover-small",{opacity:1});
+                    tl.to(".title-container .chapter-title",{opacity:1},"<");
+
+                    bottomCounter++;
+                 }
+             }
+    
+             if(delta<0){
+                 //scrolling up 
+
+                 bottomCounter=0
+                 let titleHeigth="8vh"
+                 
+                 if($(this).scrollTop()==0){
+                     if(topCounter==0){
+                        // document.documentElement.style.setProperty("--cover-image-height","270px")
+                        tl.to(".title-container .chapter-title",{opacity:0});
+                        tl.to(".chapter-cover-small",{opacity:0},"<");
+                        tl.to(".title-container",{height:titleHeigth},"<");
+                        tl.to(".content-container",{y:"0px"});
+                        tl.to(".sub-container-cb",{paddingTop:"85px"},"<");
+
+
+                        tl.to(".title-container .book-name",{y:0});
+                        tl.to(".header",{opacity:1},"<");
+                        tl.to(".chapter-cover",{opacity:1},"<");
+                        topCounter++;
+                    }
+                }
+    
+             }
+         });
+     });
+
+
+
