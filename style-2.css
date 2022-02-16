@@ -323,6 +323,8 @@ body::before {
   position: relative;
   overflow: scroll;
   overflow-x: hidden;
+  scroll-behavior:smooth; 
+
 
 
   transition: transform var(--anim-slow) ease-in;
