@@ -19,8 +19,9 @@
     //const returnButton=mainBook.querySelector(".return");
     const headerTitle=document.querySelectorAll(".chapter-title");
     
-    const bookContent=mainBook.querySelectorAll(".book-content");
-    // const bookChapters = Array.from(content.children);
+    const bookContents=mainBook.querySelectorAll(".book-content");
+    const bookContent=mainBook.querySelector(".book-content");
+    const bookChapters = Array.from(bookContent.children);
 
     const footnotes = mainBook.querySelectorAll(".footnote")
     
@@ -343,32 +344,24 @@
 
 
     const moveChapters=(bookContent,currentChapter,targetChapter)=>{
-        targetChapter.scrollTo(0,0);
-
         if(wrapper.classList.contains("reading"))
             wrapper.classList.remove("reading");
 
-        bookContent.style.transform="translateY(-"+targetChapter.style.top+")";
+        console.log(targetChapter.dataset.scrollHeight);
+        bookContent.scrollTo(0,targetChapter.dataset.scrollHeight)
         currentChapter.classList.remove("current-chapter");
         targetChapter.classList.add("current-chapter");
-
-        if(!targetChapter.nextElementSibling){
-            arrows.querySelector(".chapter-up").classList.remove("is-hidden");
-            arrows.querySelector(".chapter-down").classList.add("is-hidden");
-        }else if(!targetChapter.previousElementSibling){
-            arrows.querySelector(".chapter-up").classList.add("is-hidden");
-            arrows.querySelector(".chapter-down").classList.remove("is-hidden");   
-        }else{
-            arrows.querySelector(".chapter-up").classList.remove("is-hidden");
-            arrows.querySelector(".chapter-down").classList.remove("is-hidden");
-        }
     }
 
-    // const setBookPosition=(bookChapters,index)=>{
-    //     bookChapters.style.top=100*index+"%"; 
-    // };
-
-    // bookChapters.forEach(setBookPosition);
+    var scrollpos=0;
+    const setBookPosition=(bookChapters,index)=>{
+        bookChapters.setAttribute("data-scroll-height", 0);
+        if(index>=1){
+            scrollpos+=bookChapters.getBoundingClientRect().height;
+            bookChapters.setAttribute("data-scroll-height", scrollpos);
+        }
+    };
+    bookChapters.forEach(setBookPosition);
 
     
     const updateDots=(currentNav,targetNav)=>{
@@ -382,7 +375,6 @@
     }
 
     const updateHeaderTitle=(targetTitle)=>{
-        console.log(targetTitle,headerTitle);
         headerTitle.forEach(title=>{
 
             title.innerHTML=targetTitle.innerHTML;
@@ -414,7 +406,7 @@
 
     burgerMenu();
 
-    bookContent.forEach(content=>{
+    bookContents.forEach((content,index)=>{
         var bottomCounter=0;      
         var topCounter=0;      
         const tl=gsap.timeline({
@@ -422,9 +414,9 @@
         });
     
          $(content).on("wheel",function(e){
-             var delta = e.originalEvent.deltaY;
+            var delta = e.originalEvent.deltaY;
     
-             if(delta>0){
+            if(delta>0){
                 //scrolling down 
                 topCounter=0;
                 let titleHeigth="10vh";
@@ -442,10 +434,10 @@
                     tl.to(".title-container .chapter-title",{opacity:1},"<");
 
                     bottomCounter++;
-                 }
-             }
+                }
+            }
     
-             if(delta<0){
+            if(delta<0){
                  //scrolling up 
 
                  bottomCounter=0
@@ -468,9 +460,85 @@
                     }
                 }
     
-             }
+            }
          });
      });
+
+        bookChapters.forEach((chapter,index)=>{
+            var bottomCounter=0;      
+            var topCounter=0;
+
+            $(bookContent).on("wheel",function(e){
+                var delta = e.originalEvent.deltaY;
+        
+                
+                if(delta>0){
+
+                    if(bottomCounter==0){
+                        
+                        if(bookContent.scrollTop>chapter.dataset.scrollHeight&&(bookContent.scrollTop<=bookContent.scrollHeight||bookContent.scrollTop<chapter.nextElementSibling.dataset.scrollHeight)&&index>=1){
+                            const currentNav= contentlibrary.querySelector(".current-chapter");
+                            var nextNav=currentNav.nextElementSibling;
+    
+                            if(!nextNav){
+                                var nextNavContainer=currentNav.closest("div.with-sub-chapters");
+                                nextNav=nextNavContainer.nextElementSibling;
+                                nextNavContainer.querySelector(".accordion-collapse").classList.remove("show")
+                            }
+    
+                            if(nextNav.classList.contains("with-sub-chapters")){
+                                var nextNavContainer=nextNav.querySelector(".inner-accordion");
+    
+                                nextNav=nextNavContainer.firstElementChild;
+                                nextNavContainer.closest("div.accordion-collapse").classList.add("show")
+                            }
+                            
+                            updateDots(currentNav,nextNav);
+                            bottomCounter++;
+                            console.log("changed",index);
+
+                        }
+                    }
+
+
+                }
+        
+                if(delta<0){
+
+                    if(topCounter==0){
+                        index--;
+                        chapter=chapter.previousElementSibling;
+
+                        if(bookContent.scrollTop<chapter.dataset.scrollHeight&&(bookContent.scrollTop<=bookChapters[0].dataset.scrollHeight||bookContent.scrollTop>chapter.previousElementSibling.dataset.scrollHeight)&&index>=1){
+                            const currentNav= contentlibrary.querySelector(".current-chapter");
+                            var nextNav=currentNav.previousElementSibling;
+    
+                            if(!nextNav){
+                                var nextNavContainer=currentNav.closest("div.with-sub-chapters");
+                                nextNav=nextNavContainer.previousElementSibling;
+                                nextNavContainer.querySelector(".accordion-collapse").classList.remove("show")
+                             }
+    
+                            if(nextNav.classList.contains("with-sub-chapters")){
+                                var nextNavContainer=nextNav.querySelector(".inner-accordion");
+    
+                                nextNav=nextNavContainer.lastElementChild;
+                                nextNavContainer.closest("div.accordion-collapse").classList.add("show")
+                            }
+                            
+                            updateDots(currentNav,nextNav);
+                            topCounter++;
+                            console.log("changed",index);
+
+                        }
+                    }
+
+
+
+                }
+             });
+        })
+
 
 
 
