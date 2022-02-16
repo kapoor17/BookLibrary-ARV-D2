@@ -464,52 +464,50 @@
          });
      });
 
+
         bookChapters.forEach((chapter,index)=>{
             var bottomCounter=0;      
             var topCounter=0;
 
+
             $(bookContent).on("wheel",function(e){
-                var delta = e.originalEvent.deltaY;
-        
-                
+                var delta=e.originalEvent.deltaY
+                var element = chapter.firstElementChild;
+                var position = element.getBoundingClientRect();
+            
+                // checking whether fully visible
                 if(delta>0){
 
                     if(bottomCounter==0){
-                        
-                        if(bookContent.scrollTop>chapter.dataset.scrollHeight&&(bookContent.scrollTop<=bookContent.scrollHeight||bookContent.scrollTop<chapter.nextElementSibling.dataset.scrollHeight)&&index>=1){
+                        if(position.top >= 0 && position.bottom <= window.innerHeight && index>=1) {
                             const currentNav= contentlibrary.querySelector(".current-chapter");
                             var nextNav=currentNav.nextElementSibling;
-    
+        
                             if(!nextNav){
                                 var nextNavContainer=currentNav.closest("div.with-sub-chapters");
                                 nextNav=nextNavContainer.nextElementSibling;
                                 nextNavContainer.querySelector(".accordion-collapse").classList.remove("show")
                             }
-    
+        
                             if(nextNav.classList.contains("with-sub-chapters")){
                                 var nextNavContainer=nextNav.querySelector(".inner-accordion");
-    
+        
                                 nextNav=nextNavContainer.firstElementChild;
                                 nextNavContainer.closest("div.accordion-collapse").classList.add("show")
                             }
-                            
+                                
                             updateDots(currentNav,nextNav);
                             bottomCounter++;
-                            console.log("changed",index);
-
                         }
                     }
-
-
+                    
                 }
-        
+
                 if(delta<0){
 
                     if(topCounter==0){
-                        index--;
-                        chapter=chapter.previousElementSibling;
-
-                        if(bookContent.scrollTop<chapter.dataset.scrollHeight&&(bookContent.scrollTop<=bookChapters[0].dataset.scrollHeight||bookContent.scrollTop>chapter.previousElementSibling.dataset.scrollHeight)&&index>=1){
+                        if(position.top >= 0 && position.bottom <= window.innerHeight &&index>=1) {
+                            index--;
                             const currentNav= contentlibrary.querySelector(".current-chapter");
                             var nextNav=currentNav.previousElementSibling;
     
@@ -520,25 +518,22 @@
                              }
     
                             if(nextNav.classList.contains("with-sub-chapters")){
-                                var nextNavContainer=nextNav.querySelector(".inner-accordion");
+                                 var nextNavContainer=nextNav.querySelector(".inner-accordion");
     
-                                nextNav=nextNavContainer.lastElementChild;
+                                 nextNav=nextNavContainer.lastElementChild;
                                 nextNavContainer.closest("div.accordion-collapse").classList.add("show")
                             }
                             
                             updateDots(currentNav,nextNav);
                             topCounter++;
-                            console.log("changed",index);
-
                         }
+
                     }
 
 
-
                 }
-             });
+            })
         })
-
 
 
 
