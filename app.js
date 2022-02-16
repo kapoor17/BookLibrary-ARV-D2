@@ -81,37 +81,67 @@
         }, 300);
     })*/
 
+    var scrolling=false;
+    $(".chapter-nav").on("click",function(){
+        if(!scrolling)
+            scrolling=true;
+
+        if($(this).hasClass("current-chapter"))
+             return;
+
+        var chapterId="#chapter-"+$(this).attr("data-articleId");
+        var targetArticle=$(chapterId);
+
+        $('.book-content').animate({
+            scrollTop:$('.book-content').scrollTop() + $(targetArticle).position().top
+        });
+
+        $(".current-chapter").removeClass("current-chapter");
+        $(this).addClass("current-chapter");
+
+        setTimeout(()=>{
+            scrolling=false;
+        },2000)
+
+        if($(targetArticle).parents(".accordion-collapse").length>0)
+        {
+            $(targetArticle).parents(".accordion-collapse").collapse("show");
+        }
+        else{
+            $(".accordion-collapse").collapse("hide");
+        }
+        updateDots(this);
+    })
 
     
-    chapterNav.forEach((nav,index)=>{
-        nav.addEventListener("click",()=>{
-            //if(content.classList.contains("with-preview")){               
-                const currentNav= contentlibrary.querySelector(".current-chapter")
 
-                if(currentNav)
-                    currentNav.classList.remove("current-chapter");
+     /*chapterNav.forEach((content,index)=>{
+         content.addEventListener("click",()=>{
+             if(content.classList.contains("with-preview")){               
+                 const currentNav= contentlibrary.querySelector(".current-chapter")
+                 if(currentNav)
+                     currentNav.classList.remove("current-chapter");
                 
-                    nav.classList.add("current-chapter");
+                 const chapterTitle=content.querySelector(".accordion-header p");
+                 updateHeaderTitle(chapterTitle);
                 
-                const chapterTitle=nav.querySelector(".accordion-header p");
-                updateHeaderTitle(chapterTitle);
-                
+                 content.classList.add("current-chapter");
 
                 window.history.pushState({id:1},null,"");
 
-                const currentChapter =  bookContent.querySelector(".current-chapter");
-                const targetChapter = bookChapters[index];
+                 const currentChapter =  bookContent.querySelector(".current-chapter");
+                 const targetChapter = bookChapters[index];
 
-                moveChapters(bookContent, currentChapter, targetChapter);
+                 moveChapters(bookContent, currentChapter, targetChapter);
 
-            //}
-        })
+            }
+         })
     })
 
 
 
 
-    /*bookChapters.forEach(chapter=>{
+    bookChapters.forEach(chapter=>{
         var bottomCounter=0
 
         $(chapter).on("wheel",function(e){
@@ -184,14 +214,14 @@
             if(wrapper.classList.contains("footnote-open"))
                     closeFootnote.click();
         });
-    });
+    });*/
 
 
     footnotes.forEach((footnote)=>{
         footnote.addEventListener("click",(e)=>{
             e.stopPropagation();
             gsap.to(".opacity-sheet-footnote",{display:"block"});
-            gsap.fromTo(".foot-note-container",{display:"none",opacity:0},{display:"block",opacity:1},"<");
+            gsap.fromTo(".foot-note-container",{display:"none",opacity:0},{display:"flex",opacity:1},"<");
         })
     })
 
@@ -267,10 +297,13 @@
        //reset values 
       xDown = null;
       yDown = null;                                             
-    };*/
+    };
 
 
     const moveChapters=(bookContent,currentChapter,targetChapter)=>{
+        if(wrapper.classList.contains("reading"))
+            wrapper.classList.remove("reading");
+
         bookContent.scrollTo(0,targetChapter.dataset.scrollHeight)
         currentChapter.classList.remove("current-chapter");
         targetChapter.classList.add("current-chapter");
@@ -287,21 +320,18 @@
     bookChapters.forEach(setBookPosition);
 
     
-    const updateDots=(currentNav,targetNav)=>{
-        const chapterTitle=targetNav.querySelector(".accordion-header p")
+    const updateDots=(targetNav)=>{
+        const chapterTitle=$(targetNav).find(".accordion-header p").text();
         updateHeaderTitle(chapterTitle);
-
+        return;
+        alert(chapterTitle);
         targetNav.scrollIntoView(false);
-
-        if(currentNav)
-            currentNav.classList.remove("current-chapter");
-        if(targetNav)
-            targetNav.classList.add("current-chapter")
     }
 
     const updateHeaderTitle=(targetTitle)=>{
         headerTitle.forEach(title=>{
-            title.innerHTML=targetTitle.innerHTML;
+
+            title.innerHTML=targetTitle;
         })
     }
     
@@ -330,7 +360,7 @@
 
     burgerMenu();
 
-    bookContents.forEach((content)=>{
+    bookContents.forEach((content,index)=>{
         var bottomCounter=0;      
         var topCounter=0;      
         const tl=gsap.timeline({
@@ -351,11 +381,13 @@
                     tl.to(".title-container",{height:titleHeigth},"<");
                     
                     tl.to(".content-container",{y:"-17.5%"});
+                    tl.to(".book-info",{opacity:0,height:0,padding:0},"<")
+                    tl.to(".content-library",{height:"100%"},"<");
                     tl.to(".sub-container-cb",{paddingTop:"0px"},"<");
 
-                    tl.to(".title-container .book-name",{y:-15},);
+                    tl.to(".title-container .book-name",{y:15},);
                     tl.to(".chapter-cover-small",{opacity:1});
-                    tl.to(".title-container .chapter-title",{opacity:1},"<");
+                    tl.to(".title-container .chapter-title",{opacity:1,y:-30},"<");
 
                     bottomCounter++;
                 }
@@ -374,6 +406,9 @@
                         tl.to(".chapter-cover-small",{opacity:0},"<");
                         tl.to(".title-container",{height:titleHeigth},"<");
                         tl.to(".content-container",{y:"0px"});
+                        tl.to(".book-info",{opacity:1,height:"20%",padding:"1em 0em"},"<")
+                        tl.to(".content-library",{height:"80%"},"<");
+
                         tl.to(".sub-container-cb",{paddingTop:"85px"},"<");
 
 
@@ -388,82 +423,42 @@
          });
      });
 
-     const moveAccordionElements=(direction,currentNav)=>{
+     const isVisible = function (ele, container) {
+        const eleTop = ele.offsetTop;
+        const eleBottom = eleTop + ele.clientHeight;
+
+        const containerTop = container.scrollTop;
+        const containerBottom = containerTop + (container.clientHeight/2);
+
+        // The element is fully visible in the container
+        return (eleTop <= containerBottom && eleBottom > containerBottom);
         
-        if(direction){
-            var nextNav=currentNav.nextElementSibling;
-            if(!nextNav){
-                var nextNavContainer=currentNav.closest("div.with-sub-chapters");
-                nextNav=nextNavContainer.nextElementSibling;
-                nextNavContainer.querySelector(".accordion-collapse").classList.remove("show")
-            }
-            if(nextNav.classList.contains("with-sub-chapters")){
-                var nextNavContainer=nextNav.querySelector(".inner-accordion");
-                nextNav=nextNavContainer.firstElementChild;
-                nextNavContainer.closest("div.accordion-collapse").classList.add("show")
-            }
+    };
+
+    var accordionId;
+
+    $(".book-content").on("scroll",function(e){
+        if(scrolling){
+         return;
         }
-        else{
-            var nextNav=currentNav.previousElementSibling;
-            if(!nextNav){
-                var nextNavContainer=currentNav.closest("div.with-sub-chapters");
-                nextNav=nextNavContainer.previousElementSibling;
-                nextNavContainer.querySelector(".accordion-collapse").classList.remove("show")
-            }
-            if(nextNav.classList.contains("with-sub-chapters")){
-                var nextNavContainer=nextNav.querySelector(".inner-accordion");
-                nextNav=nextNavContainer.lastElementChild;
-                nextNavContainer.closest("div.accordion-collapse").classList.add("show")
-            }
-        }
-
-        updateDots(currentNav,nextNav);
-
-     }
-
-        bookChapters.forEach((chapter,index)=>{
-            var bottomCounter=0;      
-            var topCounter=0;
-
-
-            $(bookContent).on("wheel",function(e){
-                var delta=e.originalEvent.deltaY
-                var element = chapter.firstElementChild;
-                var position = element.getBoundingClientRect();
-            
-                if(delta>0){
-
-                    topCounter=0;
-                    
-                    if(bottomCounter==0){
-                        // checking whether fully visible
-                        if(position.top >= 0 && position.bottom <= (bookContent.getBoundingClientRect().height/2) && index>=1) {
-                            const currentNav= contentlibrary.querySelector(".current-chapter");
-                            moveAccordionElements(true,currentNav);
-                            bottomCounter++;
-                        }
-                    }
-                    
+        $(".chapters").each(function()
+        {
+            if(isVisible(this,document.querySelector(".book-content"))){
+                var targetNav=document.querySelector("#chapterNav-"+$(this).attr("data-navId"));
+                if($(targetNav).parents(".accordion-collapse").length>0)
+                {
+                    $(targetNav).parents(".accordion-collapse").collapse("show");
                 }
-
-                if(delta<0){
-
-                    bottomCounter=0;
-
-                    if(topCounter==0){
-                        if(position.top >= (bookContent.getBoundingClientRect().height/2) && position.bottom <= (bookContent.getBoundingClientRect().height) && index>=1) {
-
-                            const currentNav= contentlibrary.querySelector(".current-chapter");
-                            moveAccordionElements(false,currentNav);
-                            topCounter++;
-                        }
-
-                    }
-
-
+                else{
+                    $(".accordion-collapse").collapse("hide");
                 }
-            })
-        })
+                $(".current-chapter").removeClass("current-chapter");
+                $(targetNav).addClass("current-chapter");
 
+                updateDots(targetNav);
+                
+            }
+        });
+    })
 
 
